@@ -1,0 +1,98 @@
+Pour obtenir des informations sur la mémoire RAM, le disque dur, le processeur, et le réseau via SNMP, tu peux utiliser les MIBs (Management Information Bases) spécifiques qui définissent les objets SNMP à interroger pour ces informations. Je vais te donner une vue d'ensemble des MIBs les plus courants pour chaque catégorie, ainsi que les OIDs correspondants pour obtenir ces informations via SNMP.
+
+1. Mémoire RAM
+
+Les informations de mémoire sont souvent accessibles via les objets MIB de HOST-RESOURCES-MIB.
+
+Mémoire physique totale :
+OID : .1.3.6.1.2.1.25.2.2.0
+
+snmpwalk -v 2c -c public 172.17.0.2 1.3.6.1.2.1.25.2.2.0
+
+Mémoire utilisée :
+OID : .1.3.6.1.2.1.25.2.3.1.6 (Cela donne la mémoire en usage par les processus système)
+
+Mémoire disponible :
+OID : .1.3.6.1.2.1.25.2.3.1.5 (Mémoire libre)
+
+
+2. Disque dur
+
+Les informations sur l'espace disque sont également accessibles via HOST-RESOURCES-MIB.
+
+Espace disque total :
+OID : .1.3.6.1.2.1.25.2.3.1.5 (Stockage total)
+
+Espace disque libre :
+OID : .1.3.6.1.2.1.25.2.3.1.6 (Stockage libre)
+
+Espace disque utilisé :
+OID : .1.3.6.1.2.1.25.2.3.1.7 (Stockage utilisé)
+
+Tu peux obtenir ces informations avec un snmpwalk sur l'OID approprié.
+3. Processeur (CPU)
+
+Les informations sur le processeur (comme la charge CPU) sont disponibles via HOST-RESOURCES-MIB et UCD-SNMP-MIB.
+
+Charge CPU (utilisation) :
+OID : .1.3.6.1.2.1.25.3.3.1.2 (Cela montre l'usage du CPU sur un intervalle de temps donné)
+
+Commande pour récupérer l'utilisation CPU :
+
+snmpwalk -v 2c -c public 172.17.0.2 1.3.6.1.2.1.25.3.3.1.2
+
+
+Temps d'uptime du processeur :
+OID : .1.3.6.1.2.1.25.3.3.1.1 (Temps de fonctionnement de chaque cœur de processeur)
+
+Nombre de cœurs du CPU :
+OID : .1.3.6.1.2.1.25.3.3.1.4
+
+
+4. Réseau
+
+Les informations réseau sont généralement accessibles via IF-MIB (Interface MIB).
+
+Interface réseau (ex: eth0) :
+OID : .1.3.6.1.2.1.2.2.1.2 (Nom de l'interface)
+
+Exemple pour obtenir une liste d'interfaces réseau :
+snmpwalk -v 2c -c public 172.17.0.2 1.3.6.1.2.1.2.2.1.2
+
+
+Bytes reçus sur l'interface réseau :
+OID : .1.3.6.1.2.1.2.2.1.10 (Bytes reçus)
+
+Commande pour récupérer les bytes reçus :
+snmpwalk -v 2c -c public 172.17.0.2 1.3.6.1.2.1.2.2.1.10
+
+Bytes envoyés sur l'interface réseau :
+OID : .1.3.6.1.2.1.2.2.1.16 (Bytes envoyés)
+
+Utilisation de l'interface (fréquence) :
+OID : .1.3.6.1.2.1.2.2.1.5 (Vitesse de l'interface)
+
+
+Exemple complet de commandes SNMP pour récupérer ces informations :
+
+Mémoire :
+snmpwalk -v 2c -c public 172.17.0.2 1.3.6.1.2.1.25.2.2.0  # Mémoire totale
+snmpwalk -v 2c -c public 172.17.0.2 1.3.6.1.2.1.25.2.3.1.6  # Mémoire utilisée
+
+
+Disque dur :
+snmpwalk -v 2c -c public 172.17.0.2 1.3.6.1.2.1.25.2.3.1.5  # Espace disque total
+snmpwalk -v 2c -c public 172.17.0.2 1.3.6.1.2.1.25.2.3.1.6  # Espace disque libre
+
+
+Processeur :
+snmpwalk -v 2c -c public 172.17.0.2 1.3.6.1.2.1.25.3.3.1.2  # Charge CPU
+snmpwalk -v 2c -c public 172.17.0.2 1.3.6.1.2.1.25.3.3.1.1  # Temps uptime CPU
+
+Réseau :
+snmpwalk -v 2c -c public 172.17.0.2 1.3.6.1.2.1.2.2.1.2  # Interfaces réseau
+snmpwalk -v 2c -c public 172.17.0.2 1.3.6.1.2.1.2.2.1.10  # Bytes reçus
+snmpwalk -v 2c -c public 172.17.0.2 1.3.6.1.2.1.2.2.1.16  # Bytes envoyés
+
+
+
