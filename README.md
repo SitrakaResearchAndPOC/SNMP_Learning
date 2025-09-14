@@ -1,3 +1,16 @@
+# INSTALLATION
+``` 
+apt update
+``` 
+``` 
+apt install docker.io
+``` 
+OU
+``` 
+snap install docker
+``` 
+
+
 # COURS 1 : COMMANDE SNMP
 Commandes SNMP (paquet snmp)
 ## 1. snmpwalk
@@ -648,5 +661,116 @@ Plus “coûteux” en overhead réseau car implique des échanges supplémentai
       </tr>
     </tbody>
   </table>
+
+# Exercices 5 : SNMP V3
+Tutoriel : Configurer SNMPv3 dans un conteneur Docker avec net-snmp </br>
+Mettre en place un agent SNMPv3 sécurisé dans un conteneur Ubuntu (ubuntu:24.04) en utilisant : </br>
+net-snmp et snmpd </br>
+net-snmp-create-v3-user pour créer un utilisateur avec authentification (MD5) et chiffrement (DES) </br>
+Tester l’accès avec snmpwalk </br>
+## Étape 1 : Lancer le conteneur Docker
+```
+docker run -itd --name snmpv3-container --hostname snmpv3-container ubuntu:24.04
+```
+## Étape 2 : Installer SNMP et SNMPD
+```
+docker exec -it snmpv3-container bash
+```
+Puis à l’intérieur du conteneur :
+```
+apt-get update
+apt-get install -y snmp snmpd snmp-mibs-downloader nano
+```
+## Étape 3 : Créer un utilisateur SNMPv3
+Utilisons l'outil net-snmp-create-v3-user
+```
+net-snmp-create-v3-user -ro -a SHA -A myAuthPass -x AES -X myPrivPass snmpv3user
+```
+OU
+```
+net-snmp-create-v3-user -ro -a MD5 -A myAuthPass -x DES -X myPrivPass snmpv3user
+```
+-ro : utilisateur en lecture seule </br>
+-a MD5 : algorithme d’authentification </br>
+-A : mot de passe d’authentification </br>
+-x DES : algorithme de chiffrement </br>
+-X : mot de passe de chiffrement </br>
+snmpv3user : nom d’utilisateur SNMPv3 </br>
+Cette commande modifie automatiquement /var/lib/snmp/snmpd.conf pour inclure cet utilisateur.
+```
+cat /var/lib/snmp/snmpd.conf
+```
+## Étape 4 : Configurer le fichier /etc/snmp/snmpd.conf
+verifie le fichier :
+```
+cat /etc/snmp/snmpd.conf
+```
+verifie la configuration ainsi :
+
+```
+
+# Désactive l’écoute sur IPv6 si non nécessaire
+agentAddress udp:161
+
+# Infos sur l’agent
+sysLocation "Unknown"
+sysContact "Unknown"
+
+# Active SNMPv3 uniquement
+createUser snmpv3user MD5 "myAuthPass" DES "myPrivPass"
+rouser snmpv3user authPriv
+```
+IMPORTANT : </br>
+Ici, on interdit tout accès public SNMPv1/v2c en ne mettant pas de rocommunity.
+
+## Étape 5 : Démarrer SNMPD
+```
+service snmpd restart
+```
+```
+service snmpd status
+```
+## Étape 6 : Tester avec snmpwalk (SNMPv3)
+Test de connexion à l’agent local :
+```
+snmpwalk -v3 -u snmpv3user -a SHA -A myAuthPass -x AES -X myPrivPass -l authPriv localhost 1.3.6.1.2.1.1
+```
+OU
+```
+snmpwalk -v3 -u snmpv3user -a MD5 -A myAuthPass -x DES -X myPrivPass -l authPriv localhost 1.3.6.1.2.1.1
+```
+-v3 : version SNMP </br>
+-u : utilisateur SNMPv3 </br>
+-a, -A : auth type et mot de passe </br>
+-x, -X : privacy type et mot de passe </br>
+-l authPriv : niveau de sécurité (authentification + chiffrement) </br>
+
+## Exemples spécifiques (SysName, SysLocation, etc.)
+* SysName
+```
+snmpwalk -v3 -u snmpv3user -a SHA -A myAuthPass -x AES -X myPrivPass -l authPriv localhost 1.3.6.1.2.1.1.5.0
+```
+OU
+```
+snmpwalk -v3 -u snmpv3user -a MD5 -A myAuthPass -x DES -X myPrivPass -l authPriv localhost 1.3.6.1.2.1.1.5.0
+```
+
+* SysLocation
+```
+snmpwalk -v3 -u snmpv3user -a SHA -A myAuthPass -x AES -X myPrivPass -l authPriv localhost 1.3.6.1.2.1.1.6.0
+```
+OU
+```
+snmpwalk -v3 -u snmpv3user -a MD5 -A myAuthPass -x DES -X myPrivPass -l authPriv localhost 1.3.6.1.2.1.1.6.0
+```
+
+* SysContact
+```
+snmpwalk -v3 -u snmpv3user -a SHA -A myAuthPass -x AES -X myPrivPass -l authPriv localhost 1.3.6.1.2.1.1.4.0
+```
+OU
+```
+snmpwalk -v3 -u snmpv3user -a MD5 -A myAuthPass -x DES -X myPrivPass -l authPriv localhost 1.3.6.1.2.1.1.4.0
+```
 
   
