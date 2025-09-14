@@ -407,3 +407,21 @@ rouser authPrivUser authpriv -V systemonly
 
 # include a all *.conf files in a directory
 ```
+Démarrer et tester le services
+```
+service snmp start
+```
+```
+service snmp status
+```
+
+
+```
+snmpwalk -v2c -c public localhost 1.3.6.1.2.1.1.5.0
+```
+```
+snmpset -v2c -c private localhost 1.3.6.1.2.1.1.5.0 s test
+```
+```
+snmpwalk -v2c -c public localhost 1.3.6.1.2.1.1.5.0
+```
