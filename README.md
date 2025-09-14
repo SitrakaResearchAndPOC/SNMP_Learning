@@ -89,23 +89,24 @@ apt-get install -y snmp snmp-mibs-downloader
 ```
 docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' snmp-agent
 ```
+Obtenir <ip_addr_agent>
 ## Tester la communication depuis le manager
 ```
-snmpwalk -v2c -c public 172.17.0.2
+snmpwalk -v2c -c public <ip_addr_agent>
 ```
 
 ## Étape 4 : Interroger des MIBs spécifiques
 * Nom de l'hôte (sysName)
 ```
-snmpwalk -v2c -c public 172.17.0.2 1.3.6.1.2.1.1.5.0
+snmpwalk -v2c -c public <ip_addr_agent> 1.3.6.1.2.1.1.5.0
 ```
 * Emplacement (sysLocation)
 ```
-snmpwalk -v2c -c public 172.17.0.2 iso.3.6.1.2.1.1.6.0
+snmpwalk -v2c -c public <ip_addr_agent> iso.3.6.1.2.1.1.6.0
 ```
 * Contact (sysContact)
 ```
-snmpwalk -v2c -c public 172.17.0.2 iso.3.6.1.2.1.1.4.0
+snmpwalk -v2c -c public <ip_addr_agent> iso.3.6.1.2.1.1.4.0
 ```
 
 ## Étape 5 : MIB pour Mémoire, CPU, Disque et Réseau
@@ -113,12 +114,12 @@ snmpwalk -v2c -c public 172.17.0.2 iso.3.6.1.2.1.1.4.0
 Mémoire totale
 
 ```
-snmpwalk -v2c -c public 172.17.0.2 1.3.6.1.2.1.25.2.2.0
+snmpwalk -v2c -c public <ip_addr_agent> 1.3.6.1.2.1.25.2.2.0
 ```
 Utilisation mémoire
 
 ```
-snmpwalk -v2c -c public 172.17.0.2 1.3.6.1.2.1.25.2.3.1.6
+snmpwalk -v2c -c public <ip_addr_agent> 1.3.6.1.2.1.25.2.3.1.6
 ```
 
 * Disque dur
@@ -126,32 +127,32 @@ snmpwalk -v2c -c public 172.17.0.2 1.3.6.1.2.1.25.2.3.1.6
 Espace disque total
 
 ```
-snmpwalk -v2c -c public 172.17.0.2 1.3.6.1.2.1.25.2.3.1.5
+snmpwalk -v2c -c public <ip_addr_agent> 1.3.6.1.2.1.25.2.3.1.5
 ```
 
 Espace disque libre
 
 ```
-snmpwalk -v2c -c public 172.17.0.2 1.3.6.1.2.1.25.2.3.1.6
+snmpwalk -v2c -c public <ip_addr_agent> 1.3.6.1.2.1.25.2.3.1.6
 ```
 
 * CPU
 
 ```
-snmpwalk -v2c -c public 172.17.0.2 1.3.6.1.2.1.25.3.3.1.2
+snmpwalk -v2c -c public <ip_addr_agent> 1.3.6.1.2.1.25.3.3.1.2
 ```
 
 * Réseau
 Interfaces réseau
 
 ```
-snmpwalk -v2c -c public 172.17.0.2 1.3.6.1.2.1.2.2.1.2
+snmpwalk -v2c -c public <ip_addr_agent> 1.3.6.1.2.1.2.2.1.2
 ```
 Octets reçus
 ```
-snmpwalk -v2c -c public 172.17.0.2 1.3.6.1.2.1.2.2.1.10
+snmpwalk -v2c -c public <ip_addr_agent> 1.3.6.1.2.1.2.2.1.10
 ```
 Octets envoyés
 ```
-snmpwalk -v2c -c public 172.17.0.2 1.3.6.1.2.1.2.2.1.16
+snmpwalk -v2c -c public <ip_addr_agent> 1.3.6.1.2.1.2.2.1.16
 ```
