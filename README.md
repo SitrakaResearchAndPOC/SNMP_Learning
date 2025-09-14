@@ -26,7 +26,19 @@ service snmpd status
 ``` 
 ``` 
 snmpwalk -v2c -c public localhost
-``` 
+```
+MIB SysName :
 ``` 
 snmpwalk -v2c -c public localhost 1.3.6.1.2.1.1.5
 ``` 
+MIB sysLocation :
+``` 
+snmpwalk -v2c -c public localhost iso.3.6.1.2.1.1.6.0
+``` 
+MIB syscontact: 
+```
+snmpwalk -v2c -c public localhost iso.3.6.1.2.1.1.4.0
+``` 
+
+
+
