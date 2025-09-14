@@ -442,15 +442,154 @@ docker exec -it snmp-container bash
 apt update
 ```
 ```
-apt install -y snmpd snmp nano  snmp-mibs-downloader snmptrapd 
+apt install -y snmpd snmp nano  snmp-mibs-downloader snmptrapd net-tools
 ```
+* Pour ecouter le trap :
+Activer l'ecoute de trap
+```
+nano /etc/snmp/snmptrapd.conf
+```
+```
+
+#
+# EXAMPLE-trap.conf:
+#   An example configuration file for configuring the Net-SNMP snmptrapd agent.
+#
+###############################################################################
+#
+# This file is intended to only be an example.
+# When the snmptrapd agent starts up, this is where it will look for it.
+#
+# All lines beginning with a '#' are comments and are intended for you
+# to read.  All other lines are configuration commands for the agent.
+
+#
+# PLEASE: read the snmptrapd.conf(5) manual page as well!
+#
+authCommunity log,execute,net private　
+authCommunity log,execute,net public
+#
+## send mail when get any events
+#traphandle default /usr/bin/traptoemail -s smtp.example.org foobar@example.org
+#
+## send mail when get linkDown
+#traphandle .1.3.6.1.6.3.1.1.5.3 /usr/bin/traptoemail -s smtp.example.org foobar@example.org
+```
+
 Lancer snmptrapd en mode console
 ```
-sudo snmptrapd -f -Lo
+snmptrapd -f -Lo
 ```
 -f : ne pas daemoniser, rester en premier plan (utile pour debug) </br>
 -Lo : logger les traps reçus sur la sortie standard (stdout) </br>
 
+* Nouveau terminal pour lancer le traps : ctrl+shift+t
+```
+docker exec -it snmp-container bash
+```
+Ajouter l'activation de trap via : trapsink, trap2sink, inform2sink
+```
+ifconfig
+```
+<ip_addr> :  172.17.0.4
+
 ```
 nano /etc/snmp/snmpd.conf 
 ```
+Dans la configuration, nous utilisons trap2sink : trap2sink  <ip_addr> public
+```
+###########################################################################
+#
+# snmpd.conf
+# An example configuration file for configuring the Net-SNMP agent ('snmpd')
+# See snmpd.conf(5) man page for details
+#
+###########################################################################
+# SECTION: System Information Setup
+#
+
+# syslocation: The [typically physical] location of the system.
+#   Note that setting this value here means that when trying to
+#   perform an snmp SET operation to the sysLocation.0 variable will make
+#   the agent return the "notWritable" error code.  IE, including
+#   this token in the snmpd.conf file will disable write access to
+#   the variable.
+#   arguments:  location_string
+sysLocation    Sitting on the Dock of the Bay
+sysContact     Me <me@example.org>
+
+# sysservices: The proper value for the sysServices object.
+#   arguments:  sysservices_number
+sysServices    72
+
+
+
+###########################################################################
+# SECTION: Agent Operating Mode
+#
+#   This section defines how the agent will operate when it
+#   is running.
+
+# master: Should the agent operate as a master agent or not.
+#   Currently, the only supported master agent type for this token
+#   is "agentx".
+#   
+#   arguments: (on|yes|agentx|all|off|no)
+
+master  agentx
+
+# agentaddress: The IP address and port number that the agent will listen on.
+#   By default the agent listens to any and all traffic from any
+#   interface on the default SNMP port (161).  This allows you to
+#   specify which address, interface, transport type and port(s) that you
+#   want the agent to listen on.  Multiple definitions of this token
+#   are concatenated together (using ':'s).
+#   arguments: [transport:]port[@interface/address],...
+
+agentaddress  127.0.0.1,[::1]
+
+
+
+###########################################################################
+# SECTION: Access Control Setup
+#
+#   This section defines who is allowed to talk to your running
+#   snmp agent.
+
+# Views 
+#   arguments viewname included [oid]
+
+#  system + hrSystem groups only
+view   systemonly  included   .1.3.6.1.2.1.1
+view   systemonly  included   .1.3.6.1.2.1.25.1
+
+
+# rocommunity: a SNMPv1/SNMPv2c read-only access community name
+#   arguments:  community [default|hostname|network/bits] [oid | -V view]
+
+# Read-only access to everyone to the systemonly view
+rocommunity  public default -V systemonly
+rocommunity6 public default -V systemonly
+
+# SNMPv3 doesn't use communities, but users with (optionally) an
+# authentication and encryption string. This user needs to be created
+# with what they can view with rouser/rwuser lines in this file.
+#
+# createUser username (MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224) authpassphrase [DES|AES] [privpassphrase]
+# e.g.
+# createuser authPrivUser SHA-512 myauthphrase AES myprivphrase
+#
+# This should be put into /var/lib/snmp/snmpd.conf 
+#
+# rouser: a SNMPv3 read-only access username
+#    arguments: username [noauth|auth|priv [OID | -V VIEW [CONTEXT]]]
+rouser authPrivUser authpriv -V systemonly
+
+# include a all *.conf files in a directory
+includeDir /etc/snmp/snmpd.conf.d
+trap2sink  <ip_addr> public
+```
+```
+snmptrap -v 2c -c public localhost ''   .1.3.6.1.6.3.1.1.5.1   .1.3.6.1.2.1.1.3.0 s "Trap test depuis agent"
+```
+
