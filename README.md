@@ -1,4 +1,4 @@
-# COMMANDE SNMP
+# COURS 1 : COMMANDE SNMP
 Commandes SNMP (paquet snmp)
 ## 1. snmpwalk
 Parcourt récursivement un sous-arbre d’un agent SNMP
@@ -61,15 +61,16 @@ Affiche l’état réseau d’un hôte (comme netstat)
 snmpnetstat -v2c -c public 192.168.1.100 -r
 ```
 
-# Installation download-mib
+# COURS 2 : Installation download-mib
 ```
 ls /usr/share/snmp/mibs/
 ```
 Éviter les messages "Unknown Object Identifier"
 * Ajouter le chemin du mibs dans : /etc/snmp/snmpd.conf
-
 ```
-root@snmp-agent:/# cat /etc/snmp/snmp.conf
+nano /etc/snmp/snmp.conf
+```
+```
 # As the snmp packages come without MIB files due to license reasons, loading
 # of MIBs is disabled by default. If you added the MIBs you can reenable
 # loading them by commenting out the following line.
@@ -132,7 +133,7 @@ Résultat lisible comme SNMPv2-MIB::sysName.0 = STRING: myhost
     </tbody>
   </table>
 
-# SNMP_Learning : ROCOMMUNITY
+# EXERCICES 1 : SNMP_Learning : ROCOMMUNITY
 
 ``` 
 docker run -itd --name snmp-container --hostname snmp-container ubuntu:24.04
@@ -173,7 +174,7 @@ MIB syscontact:
 ```
 snmpwalk -v2c -c public localhost iso.3.6.1.2.1.1.4.0
 ``` 
-# Separation Agent et Manager : ROCOMMUNITY : Agent + Manager
+# EXERCICES 2 : Separation Agent et Manager : ROCOMMUNITY : Agent + Manager
 ## Etape1 : Lancer un conteneur Ubuntu nommé snmp-agent
 ``` 
 docker run -itd --name snmp-agent --hostname snmp-agent ubuntu:24.04
@@ -291,7 +292,7 @@ Octets envoyés
 snmpwalk -v2c -c public <ip_addr_agent> 1.3.6.1.2.1.2.2.1.16
 ```
 
-# SNMP avec RW COMMUNITY
+# EXERCICES 3 : SNMP avec RW COMMUNITY
 ```
 docker rm -f snmp-container
 ```
@@ -427,7 +428,7 @@ snmpwalk -v2c -c public localhost 1.3.6.1.2.1.1.5.0
 ```
 
 
-## Traps : 
+# EXERCICE 4 :  Traps  
 
 ```
 docker rm -f snmp-container
@@ -593,3 +594,59 @@ trap2sink  <ip_addr> public
 snmptrap -v 2c -c public localhost ''   .1.3.6.1.6.3.1.1.5.1   .1.3.6.1.2.1.1.3.0 s "Trap test depuis agent"
 ```
 
+## COURS 3 : trapsink, trap2sink, inform2sink
+* 1. trapsink
+Envoie des traps SNMP v1 uniquement. </br>
+Trap = notification non confirmée envoyée par l’agent SNMP à un manager. </br>
+Pas d’accusé de réception : l’agent envoie le trap et ne sait pas si le manager l’a reçu. </br>
+Syntaxe classique pour les vieilles infrastructures SNMP. </br>
+
+2. trap2sink
+Envoie des traps SNMP v2c (version 2 community-based). </br>
+Toujours non confirmés (pas d’ACK), comme pour trapsink. </br>
+Supporte le format plus riche SNMP v2 (plus d’informations, types améliorés). </br>
+C’est la version recommandée si tu utilises SNMP v2. </br>
+
+3. informsink (ou inform2sink)
+Envoie des informs SNMP v2c. </br>
+Informs = traps confirmés, c’est-à-dire que le manager doit envoyer un accusé de réception à l’agent. </br>
+Si le manager ne répond pas, l’agent peut réessayer d’envoyer le message. </br>
+Permet une communication plus fiable, avec gestion des pertes. </br>
+Plus “coûteux” en overhead réseau car implique des échanges supplémentaires. </br>
+ <table>
+    <caption>Résumé des directives SNMP</caption>
+    <thead>
+      <tr>
+        <th>Directive</th>
+        <th>Version SNMP</th>
+        <th>Type de notification</th>
+        <th>Confirmation requise</th>
+        <th>Usage recommandé pour</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>trapsink</td>
+        <td>SNMP v1</td>
+        <td>Trap (non confirmé)</td>
+        <td>Non</td>
+        <td>Compatibilité v1</td>
+      </tr>
+      <tr>
+        <td>trap2sink</td>
+        <td>SNMP v2c</td>
+        <td>Trap (non confirmé)</td>
+        <td>Non</td>
+        <td>SNMP v2, simple</td>
+      </tr>
+      <tr>
+        <td>informsink</td>
+        <td>SNMP v2c</td>
+        <td>Inform (confirmé)</td>
+        <td>Oui</td>
+        <td>Notifications fiables</td>
+      </tr>
+    </tbody>
+  </table>
+
+  
