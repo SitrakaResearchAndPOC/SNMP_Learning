@@ -27,6 +27,7 @@ apt-get install -y snmp snmpd snmp-mibs-downloader
 Étape 3 : Créer un utilisateur SNMPv3
 
 Utilisons l'outil net-snmp-create-v3-user
+net-snmp-create-v3-user -ro -a SHA -A myAuthPass -x AES -X myPrivPass snmpv3user
 
 net-snmp-create-v3-user -ro -a MD5 -A myAuthPass -x DES -X myPrivPass snmpv3user
 
