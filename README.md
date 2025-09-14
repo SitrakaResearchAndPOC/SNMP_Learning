@@ -425,3 +425,32 @@ snmpset -v2c -c private localhost 1.3.6.1.2.1.1.5.0 s test
 ```
 snmpwalk -v2c -c public localhost 1.3.6.1.2.1.1.5.0
 ```
+
+
+## Traps : 
+
+```
+docker rm -f snmp-container
+```
+```
+docker run -itd --name snmp-container --hostname snmp-container -p 161:161/udp  -p 162:162/udp  ubuntu:24.04
+```
+```
+docker exec -it snmp-container bash
+```
+```
+apt update
+```
+```
+apt install -y snmpd snmp nano  snmp-mibs-downloader snmptrapd 
+```
+Lancer snmptrapd en mode console
+```
+sudo snmptrapd -f -Lo
+```
+-f : ne pas daemoniser, rester en premier plan (utile pour debug) </br>
+-Lo : logger les traps reçus sur la sortie standard (stdout) </br>
+
+```
+nano /etc/snmp/snmpd.conf 
+```
