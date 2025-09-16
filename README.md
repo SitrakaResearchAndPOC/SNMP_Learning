@@ -1,4 +1,4 @@
-# INSTALLATION
+# INSTALLATION sur UBUNTU
 ``` 
 apt update
 ``` 
