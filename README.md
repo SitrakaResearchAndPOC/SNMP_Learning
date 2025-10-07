@@ -161,6 +161,10 @@ apt-get update
 apt-get install -y snmp snmpd snmp-mibs-downloader
 ``` 
 ``` 
+cp /etc/snmp/snmpd.conf /etc/snmp/snmpd.conf.old
+``` 
+
+``` 
 echo "rocommunity public" > /etc/snmp/snmpd.conf
 echo "agentAddress udp:161" >> /etc/snmp/snmpd.conf
 echo "sysLocation \"Unknown\"" >> /etc/snmp/snmpd.conf
@@ -203,6 +207,11 @@ apt-get update
 apt-get install -y snmp snmpd snmp-mibs-downloader
 ``` 
 ## Configurer SNMP Agent (fichier /etc/snmp/snmpd.conf)
+``` 
+cp /etc/snmp/snmpd.conf /etc/snmp/snmpd.conf.old
+``` 
+
+
 ``` 
 echo "rocommunity public" > /etc/snmp/snmpd.conf
 echo "agentAddress udp:161" >> /etc/snmp/snmpd.conf
@@ -322,6 +331,13 @@ apt update
 apt install -y snmpd snmp nano  snmp-mibs-downloader
 ```
 ```
+cp /etc/snmp/snmpd.conf  /etc/snmp/snmpd.conf.old 
+```
+```
+echo ""  > /etc/snmp/snmpd.conf
+```
+
+```
 nano /etc/snmp/snmpd.conf 
 ```
 ```
@@ -423,15 +439,15 @@ rouser authPrivUser authpriv -V systemonly
 ```
 Démarrer et tester le services
 ```
-service snmp start
+service snmpd start
 ```
 ```
-service snmp status
+service snmpd status
 ```
 
 
 ```
-snmpwalk -v2c -c public localhost 1.3.6.1.2.1.1.5.0
+snmpwalk -v2c -c private localhost 1.3.6.1.2.1.1.5.0
 ```
 ```
 snmpset -v2c -c private localhost 1.3.6.1.2.1.1.5.0 s test
